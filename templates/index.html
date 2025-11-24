@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Boulevard World – AI Path</title>
+
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #ffe9f3, #e3ffe4);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 30px;
+            font-size: 40px;
+            color: #444;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0px 5px 25px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+
+        /* صف الخيارات */
+        .options-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        /* داخل كل مربع خيار */
+        .option-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            font-size: 18px;
+            color: #444;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        select, button {
+            padding: 12px 18px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: 2px solid #ff88c2;
+            background: #fff6fa;
+        }
+
+        button {
+            background: #ff88c2;
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #ff5daa;
+        }
+
+        .path-box {
+            background: #f8faff;
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 25px;
+            font-size: 20px;
+            color: #444;
+            border-left: 6px solid #6ac57c;
+        }
+
+        .stats-box {
+            background: #fff0f7;
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #444;
+            border-left: 6px solid #ff88c2;
+            text-align: left;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        img {
+            width: 70%;
+            margin-top: 30px;
+            border-radius: 20px;
+            box-shadow: 0px 5px 20px rgba(0,0,0,0.07);
+        }
+    </style>
+</head>
+<body>
+
+<h1>Boulevard World – AI Path</h1>
+
+<div class="container">
+
+    <h2>Select Path Options</h2>
+
+    <form method="POST">
+
+        <!-- صف واحد يحتوي 3 خيارات -->
+        <div class="options-row">
+
+            <div class="option-box">
+                <label>Enter Start:</label>
+                <select name="start">
+                    {% for n in nodes %}
+                    <option value="{{n}}" {% if n == selected_start %}selected{% endif %}>{{n}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="option-box">
+                <label>Enter Goal:</label>
+                <select name="goal">
+                    {% for n in nodes %}
+                    <option value="{{n}}" {% if n == selected_goal %}selected{% endif %}>{{n}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="option-box">
+                <label>Select Algorithm:</label>
+                <select name="algorithm">
+                    <option value="BFS" {% if selected_algo == "BFS" %}selected{% endif %}>BFS</option>
+                    <option value="DFS" {% if selected_algo == "DFS" %}selected{% endif %}>DFS</option>
+                    <option value="Astar" {% if selected_algo == "Astar" %}selected{% endif %}>A*</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button type="submit">Find Path</button>
+    </form>
+
+    {% if path %}
+    <div class="path-box">
+        <b>Path Found:</b><br>
+        {{ " > ".join(path) }}
+    </div>
+
+    <div class="stats-box">
+        <b>Total Distance:</b> {{ cost }} meters <br>
+        <b>Nodes Expanded:</b> {{ expanded }} <br>
+        <b>Time (seconds):</b> {{ "%.4f"|format(time_taken) }} <br>
+    </div>
+    {% endif %}
+
+    <div>
+        <h2>Boulevard Map</h2>
+        <img src="{{ url_for('static', filename='Map.png') }}" alt="Boulevard Map">
+    </div>
+
+</div>
+
+</body>
+</html>

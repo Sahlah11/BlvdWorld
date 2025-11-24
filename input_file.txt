@@ -1,0 +1,22 @@
+Saudi_Arabia: Turkey 150,Amazonia 120
+USA: Turkey 70,Asia 100
+Asia: Japan 100,USA 100
+Turkey: USA 70,Saudi_Arabia 150
+France: Amazonia 430
+Amazonia: Saudi_Arabia 120,China 100,France 430
+China: Amazonia 100,Korea 80,Levant 150
+Korea: China 80
+Indonesia: Korea 90
+Japan: USA 140,Mexico 80,Asia 100
+Mexico: Japan 80,Iran 60
+Pier: Mexico 70,India 130,Iran 90
+India:Pier 130,The_Plant 180
+Iran:Pier 90,Mexico 60
+Egypt: Greece 80,Kuwait 120,The_Plant 220
+Greece: Egypt 80,Kuwait 70,Italy 430,Warzone 160
+Kuwait: Greece 70,Egypt 120,Warzone 100
+Warzone:Greece 160,Kuwait 100,Morocco 400
+Levant:  Morocco 130,China 150
+Morocco: Levant 130,Warzone 400
+Italy: Greece 430
+The_Plant:Egypt 220,India 180
