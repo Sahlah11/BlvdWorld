@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,6 +81,16 @@
             border-left: 6px solid #6ac57c;
         }
 
+        .visited-box {
+            background: #fff9e6;
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 18px;
+            color: #444;
+            border-left: 6px solid #ffa500;
+        }
+
         .stats-box {
             background: #fff0f7;
             padding: 18px;
@@ -114,9 +123,7 @@
 
     <form method="POST">
 
-        <!-- صف واحد يحتوي 3 خيارات -->
         <div class="options-row">
-
             <div class="option-box">
                 <label>Enter Start:</label>
                 <select name="start">
@@ -143,7 +150,6 @@
                     <option value="Astar" {% if selected_algo == "Astar" %}selected{% endif %}>A*</option>
                 </select>
             </div>
-
         </div>
 
         <button type="submit">Find Path</button>
@@ -153,6 +159,11 @@
     <div class="path-box">
         <b>Path Found:</b><br>
         {{ " > ".join(path) }}
+    </div>
+
+    <div class="visited-box">
+        <b>Visited Nodes:</b><br>
+        {{ ", ".join(visited) }}
     </div>
 
     <div class="stats-box">

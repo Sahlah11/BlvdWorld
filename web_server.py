@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 FILE = "input_file.txt"
 
-# تحميل الرسوم البيانية
+# تحميل الرسوم
 graph_un = load_unweighted_graph(FILE)
 graph_w = load_weighted_graph(FILE)
 
@@ -25,29 +25,26 @@ def home():
 
     nodes = list(graph_un.keys())
 
-    path = None
-    cost = None
-    expanded = None
-    time_taken = None
+    path = []
+    visited = []
+    cost = 0.0
+    expanded = 0
+    time_taken = 0.0
 
-    # قيم افتراضية عند أول فتح للصفحة
     selected_start = None
     selected_goal = None
     selected_algo = None
 
     if request.method == "POST":
 
-        # استلام القيم من النموذج
         start = request.form["start"]
         goal = request.form["goal"]
         algo = request.form["algorithm"]
 
-        # حفظ القيم المختارة
         selected_start = start
         selected_goal = goal
         selected_algo = algo
 
-        # حساب الوقت
         t1 = time.time()
 
         if algo == "BFS":
@@ -57,25 +54,23 @@ def home():
         elif algo == "Astar":
             path, visited = astar(graph_w, start, goal, heuristics)
         else:
-            path = []
-            visited = []
+            path, visited = [], []
 
         t2 = time.time()
-        time_taken = round(t2 - t1, 4)   # 4 خانات
+        time_taken = round(t2 - t1, 8)  # دقة أعلى للوقت
 
-        # حساب المسافة
-        cost = compute_total_distance(path, graph_w)
+        if path:
+            cost = compute_total_distance(path, graph_w)
         expanded = len(visited)
 
     return render_template(
         "index.html",
         nodes=nodes,
         path=path,
+        visited=visited,
         cost=cost,
         expanded=expanded,
         time_taken=time_taken,
-
-        # هام جداً — نرسل الاختيارات إلى HTML
         selected_start=selected_start,
         selected_goal=selected_goal,
         selected_algo=selected_algo

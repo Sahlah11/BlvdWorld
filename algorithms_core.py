@@ -1,53 +1,15 @@
 import heapq
 from collections import deque
-
-# =========================
-# A* Node Structure
-# =========================
-class NodeA:
-    def __init__(self, position, cost=0, heuristic=0):
-        self.position = position
-        self.cost = cost
-        self.heuristic = heuristic
-        self.parent = None
-
-    def __lt__(self, other):
-        return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+from math import inf
+import time
 
 
-# =========================
-# Load graph (Unweighted)
-# =========================
-def load_unweighted_graph(filename):
+def load_weighted_graph(filename):
     graph = {}
     with open(filename, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line or ":" not in line:
-                continue
-
-            node, edges = line.split(":", 1)
-            node = node.strip()
-            edges = edges.strip()
-            graph[node] = []
-
-            for e in edges.split(","):
-                e = e.strip()
-                if not e:
-                    continue
-                neighbor = e.split()[0]
-                graph[node].append(neighbor)
-    return graph
-
-
-# =========================
-# Load graph (Weighted)
-# =========================
-def load_weighted_graph(filename):
-    graph = {}
-    with open(filename, "r", encoding="utf-8") as f:
-        for line in f:
-            if not line.strip() or ":" not in line:
                 continue
 
             node, neighbors = line.split(":", 1)
@@ -59,17 +21,37 @@ def load_weighted_graph(filename):
                 if not n:
                     continue
 
+               
                 parts = n.split()
-                if len(parts) < 2:
-                    continue
-
-                neighbor = parts[0]
-                try:
-                    dist = float(parts[1])
-                except:
-                    continue
+                if len(parts) >= 2:
+                    neighbor = parts[0].strip()
+                    try:
+                        dist = float(parts[1])
+                    except:
+                        continue
+                else:
+                   
+                    for i, ch in enumerate(n):
+                        if ch.isdigit():
+                            neighbor = n[:i].strip()
+                            try:
+                                dist = float(n[i:].strip())
+                            except:
+                                dist = 0
+                            break
+                    else:
+                        continue
 
                 graph[node][neighbor] = dist
+    return graph
+
+
+# =========================
+# Load unweighted graph
+# =========================
+def load_unweighted_graph(filename):
+    weighted = load_weighted_graph(filename)
+    graph = {node: list(neighbors.keys()) for node, neighbors in weighted.items()}
     return graph
 
 
@@ -98,23 +80,30 @@ def compute_total_distance(path, weighted_graph):
 def bfs(graph, start, goal):
     queue = deque([start])
     visited = set([start])
-    visited_list = [start]
     parent = {start: None}
+    visited_order = []
 
     while queue:
-        at = queue.popleft()
+        current = queue.popleft()
+        visited_order.append(current)
 
-        if at == goal:
-            return reconstruct_path(parent, start, goal), visited_list
+        if current == goal:
+            # إعادة بناء المسار
+            path = []
+            node = current
+            while node is not None:
+                path.append(node)
+                node = parent.get(node)
+            path.reverse()
+            return path, visited_order
 
-        for neighbor in graph.get(at, []):
+        for neighbor in graph.get(current, []):
             if neighbor not in visited:
                 visited.add(neighbor)
-                visited_list.append(neighbor)
-                parent[neighbor] = at
+                parent[neighbor] = current
                 queue.append(neighbor)
 
-    return None, visited_list
+    return None, visited_order
 
 
 # =========================
@@ -123,73 +112,122 @@ def bfs(graph, start, goal):
 def dfs(graph, start, goal):
     stack = [start]
     visited = set([start])
-    visited_list = [start]
     parent = {start: None}
+    visited_order = []
 
     while stack:
-        at = stack.pop()
+        current = stack.pop()
+        visited_order.append(current)
 
-        if at == goal:
-            return reconstruct_path(parent, start, goal), visited_list
+        if current == goal:
+          
+            path = []
+            node = current
+            while node is not None:
+                path.append(node)
+                node = parent.get(node)
+            path.reverse()
+            return path, visited_order
 
-        for neighbor in graph.get(at, []):
+        for neighbor in graph.get(current, []):
             if neighbor not in visited:
                 visited.add(neighbor)
-                visited_list.append(neighbor)
-                parent[neighbor] = at
+                parent[neighbor] = current
                 stack.append(neighbor)
 
-    return None, visited_list
+    return None, visited_order
 
 
-# =========================
-# A*
-# =========================
+
 def astar(graph, start, goal, heuristics):
-    open_set = []
-    heapq.heapify(open_set)
+    open_heap = []
+    heapq.heappush(open_heap, (heuristics.get(start, 0), 0.0, start))
 
+    g_score = {start: 0.0}
+    came_from = {}
     closed_set = set()
-    visited_list = [start]
+    visited_order = []
 
-    start_node = NodeA(start, 0, heuristics.get(start, 0))
-    heapq.heappush(open_set, start_node)
+    while open_heap:
+        f_curr, g_curr, current = heapq.heappop(open_heap)
 
-    while open_set:
-        current = heapq.heappop(open_set)
+        if current in closed_set:
+            continue
 
-        if current.position == goal:
+        closed_set.add(current)
+        visited_order.append(current)
+
+        if current == goal:
             path = []
-            while current:
-                path.insert(0, current.position)
-                current = current.parent
-            return path, visited_list
+            node = current
+            while node in came_from:
+                path.append(node)
+                node = came_from[node]
+            path.append(start)
+            path.reverse()
+            return path, visited_order
 
-        closed_set.add(current.position)
-
-        for neighbor, weight in graph.get(current.position, {}).items():
+        for neighbor, weight in graph.get(current, {}).items():
             if neighbor in closed_set:
                 continue
 
-            g = current.cost + weight
-            h = heuristics.get(neighbor, 0)
+            tentative_g = g_curr + weight
 
-            new_node = NodeA(neighbor, g, h)
-            new_node.parent = current
+            if tentative_g < g_score.get(neighbor, inf):
+                g_score[neighbor] = tentative_g
+                came_from[neighbor] = current
+                f = tentative_g + heuristics.get(neighbor, 0)
+                heapq.heappush(open_heap, (f, tentative_g, neighbor))
 
-            visited_list.append(neighbor)
-            heapq.heappush(open_set, new_node)
-
-    return None, visited_list
+    return None, visited_order
 
 
-# =========================
-# Path reconstruction
-# =========================
-def reconstruct_path(parent, start, goal):
-    path = []
-    node = goal
-    while node is not None:
-        path.append(node)
-        node = parent[node]
-    return list(reversed(path))
+if __name__ == "__main__":
+    FILE = "input_file.txt"
+
+    graph_unweighted = load_unweighted_graph(FILE)
+    graph_weighted = load_weighted_graph(FILE)
+    nodes = list(graph_unweighted.keys())
+
+    heuristics = {
+        "Saudi_Arabia": 550, "Asia": 450, "USA": 380, "Turkey": 430,
+        "France": 300, "Amazonia": 350, "China": 320, "Korea": 300,
+        "Indonesia": 250, "Japan": 400, "Mexico": 370, "Pier": 340,
+        "Iran": 310, "India": 290, "Egypt": 200, "Greece": 180,
+        "Kuwait": 150, "Warzone": 140, "Levant": 230, "Morocco": 210,
+        "Italy": 190, "The_Plant": 170
+    }
+
+    print("\nAvailable Places:")
+    for i, node in enumerate(nodes):
+        print(f"{i} = {node}")
+
+    start_i = int(input("\nEnter start index: "))
+    goal_i = int(input("Enter goal index: "))
+
+    start = nodes[start_i]
+    goal = nodes[goal_i]
+
+    print("\n1 = BFS\n2 = DFS\n3 = A*\n")
+    choice = input("Your choice: ").strip()
+
+    t0 = time.time()
+
+    if choice == "1":
+        path, visited = bfs(graph_unweighted, start, goal)
+    elif choice == "2":
+        path, visited = dfs(graph_unweighted, start, goal)
+    elif choice == "3":
+        path, visited = astar(graph_weighted, start, goal, heuristics)
+    else:
+        print("Invalid choice")
+        exit()
+
+    time_taken = time.time() - t0
+    distance = compute_total_distance(path, graph_weighted)
+
+    print("\nRESULTS")
+    print("Path:", path)
+    print("Visited:", visited)
+    print("Distance:", distance)
+    print(f"Time: {time_taken:.8f} seconds")
