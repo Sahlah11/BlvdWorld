@@ -3,7 +3,9 @@ from collections import deque
 from math import inf
 import time
 
-
+# =========================
+# Load weighted graph (bidirectional)
+# =========================
 def load_weighted_graph(filename):
     graph = {}
     with open(filename, "r", encoding="utf-8") as f:
@@ -11,17 +13,13 @@ def load_weighted_graph(filename):
             line = line.strip()
             if not line or ":" not in line:
                 continue
-
             node, neighbors = line.split(":", 1)
             node = node.strip()
-            graph[node] = {}
-
+            graph.setdefault(node, {})
             for n in neighbors.split(","):
                 n = n.strip()
                 if not n:
                     continue
-
-               
                 parts = n.split()
                 if len(parts) >= 2:
                     neighbor = parts[0].strip()
@@ -30,30 +28,21 @@ def load_weighted_graph(filename):
                     except:
                         continue
                 else:
-                   
-                    for i, ch in enumerate(n):
-                        if ch.isdigit():
-                            neighbor = n[:i].strip()
-                            try:
-                                dist = float(n[i:].strip())
-                            except:
-                                dist = 0
-                            break
-                    else:
-                        continue
-
+                    continue
                 graph[node][neighbor] = dist
+                # اجعل الرابط ثنائي الاتجاه
+                if neighbor not in graph:
+                    graph[neighbor] = {}
+                if node not in graph[neighbor]:
+                    graph[neighbor][node] = dist
     return graph
 
-
 # =========================
-# Load unweighted graph
+# Load unweighted graph (bidirectional)
 # =========================
 def load_unweighted_graph(filename):
     weighted = load_weighted_graph(filename)
-    graph = {node: list(neighbors.keys()) for node, neighbors in weighted.items()}
-    return graph
-
+    return {node: list(neighbors.keys()) for node, neighbors in weighted.items()}
 
 # =========================
 # Compute total distance
@@ -61,18 +50,14 @@ def load_unweighted_graph(filename):
 def compute_total_distance(path, weighted_graph):
     if not path or len(path) < 2:
         return 0.0
-
     total = 0.0
     for i in range(len(path) - 1):
         a, b = path[i], path[i + 1]
-
         if a in weighted_graph and b in weighted_graph[a]:
             total += weighted_graph[a][b]
         elif b in weighted_graph and a in weighted_graph[b]:
             total += weighted_graph[b][a]
-
     return total
-
 
 # =========================
 # BFS
@@ -88,7 +73,6 @@ def bfs(graph, start, goal):
         visited_order.append(current)
 
         if current == goal:
-            # إعادة بناء المسار
             path = []
             node = current
             while node is not None:
@@ -102,9 +86,7 @@ def bfs(graph, start, goal):
                 visited.add(neighbor)
                 parent[neighbor] = current
                 queue.append(neighbor)
-
     return None, visited_order
-
 
 # =========================
 # DFS
@@ -120,7 +102,6 @@ def dfs(graph, start, goal):
         visited_order.append(current)
 
         if current == goal:
-          
             path = []
             node = current
             while node is not None:
@@ -134,15 +115,14 @@ def dfs(graph, start, goal):
                 visited.add(neighbor)
                 parent[neighbor] = current
                 stack.append(neighbor)
-
     return None, visited_order
 
-
-
+# =========================
+# A* Algorithm
+# =========================
 def astar(graph, start, goal, heuristics):
     open_heap = []
     heapq.heappush(open_heap, (heuristics.get(start, 0), 0.0, start))
-
     g_score = {start: 0.0}
     came_from = {}
     closed_set = set()
@@ -150,10 +130,8 @@ def astar(graph, start, goal, heuristics):
 
     while open_heap:
         f_curr, g_curr, current = heapq.heappop(open_heap)
-
         if current in closed_set:
             continue
-
         closed_set.add(current)
         visited_order.append(current)
 
@@ -170,9 +148,7 @@ def astar(graph, start, goal, heuristics):
         for neighbor, weight in graph.get(current, {}).items():
             if neighbor in closed_set:
                 continue
-
             tentative_g = g_curr + weight
-
             if tentative_g < g_score.get(neighbor, inf):
                 g_score[neighbor] = tentative_g
                 came_from[neighbor] = current
@@ -181,7 +157,9 @@ def astar(graph, start, goal, heuristics):
 
     return None, visited_order
 
-
+# =========================
+# Main
+# =========================
 if __name__ == "__main__":
     FILE = "input_file.txt"
 
@@ -212,7 +190,6 @@ if __name__ == "__main__":
     choice = input("Your choice: ").strip()
 
     t0 = time.time()
-
     if choice == "1":
         path, visited = bfs(graph_unweighted, start, goal)
     elif choice == "2":
@@ -222,8 +199,8 @@ if __name__ == "__main__":
     else:
         print("Invalid choice")
         exit()
-
-    time_taken = time.time() - t0
+    t1 = time.time()
+    time_taken = t1 - t0
     distance = compute_total_distance(path, graph_weighted)
 
     print("\nRESULTS")
