@@ -81,7 +81,7 @@ def bfs(graph, start, goal):
             path.reverse()
             return path, visited_order
 
-        for neighbor in graph.get(current, []):
+        for neighbor in sorted(graph.get(current, [])):
             if neighbor not in visited:
                 visited.add(neighbor)
                 parent[neighbor] = current
@@ -110,7 +110,7 @@ def dfs(graph, start, goal):
             path.reverse()
             return path, visited_order
 
-        for neighbor in graph.get(current, []):
+        for neighbor in sorted(graph.get(current, [])):
             if neighbor not in visited:
                 visited.add(neighbor)
                 parent[neighbor] = current
@@ -160,7 +160,7 @@ def astar(graph, start, goal, heuristics):
 # =========================
 # Main
 # =========================
-if __name__ == "__main__":
+if __name__== "__main__":
     FILE = "input_file.txt"
 
     graph_unweighted = load_unweighted_graph(FILE)

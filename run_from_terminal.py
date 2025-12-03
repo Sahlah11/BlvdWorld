@@ -20,14 +20,22 @@ print("\nAvailable Places:")
 for i, node in enumerate(nodes):
     print(f"{i} = {node}")
 
-start_i = int(input("\nEnter start index: "))
-goal_i = int(input("Enter goal index: "))
+
+try:
+    start_i = int(input("\nEnter start index: "))
+    goal_i = int(input("Enter goal index: "))
+    if start_i < 0 or start_i >= len(nodes) or goal_i < 0 or goal_i >= len(nodes):
+        raise ValueError
+except ValueError:
+    print("Invalid index! Please enter a number between 0 and", len(nodes)-1)
+    exit()
 
 start = nodes[start_i]
 goal = nodes[goal_i]
 
 print("\n1 = BFS\n2 = DFS\n3 = A*\n")
 choice = input("Your choice: ").strip()
+
 
 t0 = time.time()
 
@@ -38,7 +46,7 @@ elif choice == "2":
 elif choice == "3":
     path, visited = astar(graph_weighted, start, goal, heuristics)
 else:
-    print("Invalid")
+    print("Invalid choice")
     exit()
 
 time_taken = time.time() - t0
@@ -48,5 +56,4 @@ print("\nRESULTS")
 print("Path:", path)
 print("Visited:", visited)
 print("Distance:", distance)
-#print("Time:", round(time_taken, 4))
-print(f"Time: {time_taken:.8f}")
+print(f"Time: {time_taken:.8f} seconds")
