@@ -4,7 +4,7 @@ from math import inf
 import time
 
 # =========================
-# Load weighted graph (bidirectional)
+# Load weighted graph 
 # =========================
 def load_weighted_graph(filename):
     graph = {}

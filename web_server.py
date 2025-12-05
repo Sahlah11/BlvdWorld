@@ -57,7 +57,7 @@ def home():
             path, visited = [], []
 
         t2 = time.time()
-        time_taken = round(t2 - t1, 8)  # دقة أعلى للوقت
+        time_taken = round(t2 - t1, 8)  
 
         if path:
             cost = compute_total_distance(path, graph_w)
