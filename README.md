@@ -1,56 +1,80 @@
-# 🗺️ BLVD World AI Map Project
+## 🗺️ BLVD World AI Pathfinding Project
 
-## 📖 Overview
-This project applies **Artificial Intelligence search algorithms** to simulate a smart navigation system inside *Boulevard World* in Riyadh, Saudi Arabia.  
-The goal is to design a robot or system capable of finding the best route between different areas, such as countries, restaurants, mosques, and facilities.
+## 📌 Overview
+This project applies **Artificial Intelligence search algorithms** to simulate a smart navigation system inside *Boulevard World* in Riyadh.  
+The system identifies the best path between two locations using BFS, DFS, and A* search.
 
-## 🧠 Algorithms Used
-We implemented and compared three main search algorithms:
-- **BFS (Breadth-First Search)** – Uninformed search strategy that finds the shortest path.
-- **DFS (Depth-First Search)** – Uninformed search that explores paths deeply before backtracking.
-- **A\*** – Informed search using heuristics to optimize pathfinding.
-
-## 🗺️ Map Design
-The map of *Boulevard World* was represented as a **graph**,  
-where:
-- Each **node** represents a location (e.g., USA, JAPAN, MOSQUE, RESTAURANT).
-- Each **edge** represents a connection/path between two locations.
-- Distances between nodes are based on approximate coordinates (x, y).
-
-Files:
-- `nodes.csv` → Contains all locations with coordinates and types.  
-- `edges.csv` → Contains all paths and distances between locations.
-
-## 🧩 How It Works
-1. The program reads the map data from CSV files.  
-2. It draws a visual map using **matplotlib**.  
-3. The user can select a start and goal point.  
-4. The algorithm finds and displays the best route.
-
-## 📸 Example Output
-- Visual map of Boulevard World with labeled zones.
-- Highlighted route showing the AI’s chosen path.
-
-## 👩‍💻 Team Members
-- Rafah Aljabri 412206325@qu.edu.sa
-- Kady
-- Sahlah Alharbi
-- Jory 
-
-## 🏫 Supervised by
-Dr.Alanoud Al-Suleiman
-Qassim University — College of Science & Arts, Unaizah  
-
-## 🧾 Course
-**Artificial Intelligence (AI)** 
-
-## ⚙️ Technologies
-- Python  
-- Matplotlib  
-- CSV Data Files  
-- Git & GitHub for version control
+The project includes:
+- A fully designed **graph** representing BLVD World.
+- A **web application (Flask)** to visualize and test algorithms.
+- A comparison of algorithms based on path, cost, nodes expanded, and execution time.
 
 ---
 
-### 🏁 Project Goal
-To simulate a **smart navigation robot** that can automatically plan and optimize routes in a complex environment using Artificial Intelligence.
+## 🧠 Algorithms Implemented
+### 1. **BFS – Breadth First Search**
+- Uninformed search  
+- Finds shallowest path  
+- Ignores weights  
+
+### 2. **DFS – Depth First Search**
+- Uninformed search  
+- Explores deep paths first  
+- May produce longer routes  
+
+### 3. **A\* Search**
+- Informed search  
+- Uses **heuristic values** assigned to each node  
+- Produces the **optimal** path with minimum total distance  
+
+---
+
+## 🗺️ Graph Design
+Boulevard World was modeled as a **graph**, where:
+
+- Each **node** represents a zone (e.g., *Saudi_Arabia, Japan, Egypt*)
+- Each **edge** represents a valid connection between two zones
+- Distances are **approximate**, based on the map layout
+- The graph is stored inside `input_file.txt`
+
+---
+
+## 🌐 Web Application (Flask)
+A simple, beautiful web interface was built using **Flask**, allowing users to:
+
+- Select **start** and **goal** nodes
+- Choose **BFS, DFS, or A\***
+- Display:
+  - Path  
+  - Total cost  
+  - Nodes expanded  
+  - Execution time  
+
+The interface includes the original BLVD World map for reference.
+
+Main file:
+web/Boulevard.py
+
+Templates:
+web/templates/index.html
+
+Static images:
+web/static/images/Map.png
+
+---
+
+## 👩‍💻 Team Members
+- **Rafah Aljabri 412206325@qu.edu.sa**
+- **Kady Aldkhil  431201766@qu.edu.sa**  
+- **Sahlah Alharbi 422215279@qu.edu.sa**  
+- **jory Aljmal 412205540@qu.edu.sa**
+
+## 🏫 Instructor
+**Dr. Alanoud Al-Suleiman**  
+Qassim University — College of Sciences & Arts, Unaizah  
+
+---
+
+## 🧾 Course
+**Artificial Intelligence – CS471**  
+
